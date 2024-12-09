@@ -114,18 +114,18 @@
 
     // Download the dataset
     $url = 'https://static.csdi.gov.hk/csdi-webpage/download/62b584a73c535b98bb484441ce1a0a48/csv';
-    $savePath = '/Applications/XAMPP/xamppfiles/htdocs/dataSet.zip';
+    $savePath = '/Applications/XAMPP/xamppfiles/htdocs/project/dataSet.zip';
     downloadDataset($url, $savePath);
 
     // Specify the path to your ZIP file and the destination directory
-    $zipFilePath = '/Applications/XAMPP/xamppfiles/htdocs/dataSet.zip';
-    $destination = '/Applications/XAMPP/xamppfiles/htdocs/';
+    $zipFilePath = $savePath;
+    $destination = '/Applications/XAMPP/xamppfiles/htdocs/project';
 
     // Call the function to unzip the ZIP file
     unzipFile($zipFilePath, $destination);
 
     // Path to the CSV file
-    $csvFile = '/Applications/XAMPP/xamppfiles/htdocs/EV_Charger_converted.csv';
+    $csvFile = '/Applications/XAMPP/xamppfiles/htdocs/project/EV_Charger_converted.csv';
     initizationDataBase($csvFile);
 ?>
 
