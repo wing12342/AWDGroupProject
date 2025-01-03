@@ -1,0 +1,62 @@
+
+
+{}=String
+||=OR Gate
+&&= AND Gate
+
+GET METHOD
+Only one parameter
+only District
+http://localhost/project/searchChargerEng.php?district={}
+    ex=http://localhost/project/searchChargerEng.php?district=Eastern
+More than one parameters
+Add Location
+http://localhost/project/searchChargerEng.php?district={}&location={}
+    ex=http://localhost/project/searchChargerEng.php?district=Eastern&location=Ming%20Wah%20Dai%20Ha&1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan
+Add Address
+http://localhost/project/searchChargerEng.php?district={}&location={}&address={}
+    ex=http://localhost/project/searchChargerEng.php?district=Eastern&location=Ming%20Wah%20Dai%20Ha&1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan$ADDRESS_EN=1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan
+
+//
+More than one parameters
+District
+Same parameters
+http://www.myserver.com/evcharger?district={}
+http://www.myserver.com/evcharger?district={} || district={}
+http://www.myserver.com/evcharger?district={} || district={} && //etc....
+
+Different parameters
+http://www.myserver.com/evcharger?district={} && location={}
+http://www.myserver.com/evcharger?district={} && location={} && address ={}
+//
+
+POST
+URL:http://localhost/project/upDateChargerEng.php
+
+Json fromat ex:
+{
+    "name_of_district_council_district_en": "Test1",
+    "location_en": "Ming Wah Dai Ha",
+    "address_en": "1 A Kung Ngam Rd, Shau Kei Wan",
+    "name_of_district_council_district_tc": "區域A",
+    "location_tc": "位置A",
+    "address_tc": "主街123",
+    "name_of_district_council_district_sc": "区域A",
+    "location_sc": "位置A",
+    "address_sc": "主街123",
+    "standard_bs1363_no": "BS1363-001",
+    "medium_iec62196_no": "1",
+    "medium_saej1772_no": "2",
+    "medium_others_no": "3",
+    "quick_chademo_no": "4",
+    "quick_ccs_dc_combo_no": "5",
+    "quick_iec62196_no": "6",
+    "quick_gb_t20234_3_dc_no": "7",
+    "quick_others_no": "8",
+    "remark_for_others": "No remarks",
+    "data_path": "/path/to/data",
+    "geometry_longitude": 123.456,
+    "geometry_latitude": 78.910,
+    "shapeid": 1
+}
+
