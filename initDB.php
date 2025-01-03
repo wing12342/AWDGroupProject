@@ -44,19 +44,67 @@
             echo "Failed to open ZIP file.";
         }
     }
-    function initizationDataBase($csvFile) {
-        $server = 'localhost';
-        $dbuser = 'root';
-        $dbpassword = '';
-        $dbname = 'ElectricVehicleChargers';
-    
-        // Create database connection
-        $conn = new mysqli($server, $dbuser, $dbpassword, $dbname);
-        if ($conn->connect_errno) {
-            die('Database connection failed: ' . $conn->connect_error);
+    function createDatabase($conn, $dbname) {
+        $sql = "CREATE DATABASE IF NOT EXISTS $dbname";
+        if ($conn->query($sql) === TRUE) {
+            echo "Database '$dbname' created successfully.<br>";
+        } else {
+            echo "Error creating database: " . $conn->error . "<br>";
         }
-        
-        // Open the CSV file
+    }
+
+    function createTable($conn, $dbname) {
+        // Select the newly created database
+        if (!$conn->select_db($dbname)) {
+            echo "Error selecting database: " . $conn->error . "<br>";
+            return;
+        }
+    
+        // SQL to create a new table
+        $createTableSQL = "CREATE TABLE `ElectricVehicleChargers` (
+            `NAME_OF_DISTRICT_COUNCIL_DISTRICT_EN` varchar(50) NOT NULL,
+            `LOCATION_EN` varchar(200) NOT NULL,
+            `ADDRESS_EN` varchar(200) NOT NULL,
+            `NAME_OF_DISTRICT_COUNCIL_DISTRICT_TC` varchar(20) NOT NULL,
+            `LOCATION_TC` varchar(50) NOT NULL,
+            `ADDRESS_TC` varchar(50) NOT NULL,
+            `NAME_OF_DISTRICT_COUNCIL_DISTRICT_SC` varchar(20) NOT NULL,
+            `LOCATION_SC` varchar(50) NOT NULL,
+            `ADDRESS_SC` varchar(50) NOT NULL,
+            `STANDARD_BS1363_no` varchar(50) NOT NULL,
+            `MEDIUM_IEC62196_no` varchar(5) NOT NULL,
+            `MEDIUM_SAEJ1772_no` varchar(5) NOT NULL,
+            `MEDIUM_OTHERS_no` varchar(5) NOT NULL,
+            `QUICK_CHAdeMO_no` varchar(5) NOT NULL,
+            `QUICK_CCS_DC_COMBO_no` varchar(5) NOT NULL,
+            `QUICK_IEC62196_no` varchar(5) NOT NULL,
+            `QUICK_GB_T20234_3_DC__no` varchar(5) NOT NULL,
+            `QUICK_OTHERS_no` varchar(5) NOT NULL,
+            `REMARK_FOR__OTHERS_` varchar(50) DEFAULT NULL,
+            `DATA_PATH` varchar(200) DEFAULT NULL,
+            `GeometryLongitude` double(40,30) NOT NULL,
+            `GeometryLatitude` double(40,30) NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+    
+        // Execute the CREATE TABLE query
+        if ($conn->query($createTableSQL) === TRUE) {
+            echo "Table 'ElectricVehicleChargers' created successfully.<br>";
+            
+            // SQL to add the primary key
+            $addPrimaryKeySQL = "ALTER TABLE `ElectricVehicleChargers`
+                ADD PRIMARY KEY (`ADDRESS_EN`, `LOCATION_EN`);";
+            
+            // Execute the ALTER TABLE query
+            if ($conn->query($addPrimaryKeySQL) === TRUE) {
+                echo "Primary key added successfully.<br>";
+            } else {
+                echo "Error adding primary key: " . $conn->error . "<br>";
+            }
+        } else {
+            echo "Error creating table: " . $conn->error . "<br>";
+        }
+    }
+    function insertRecordFromCsv($conn){
         if (($handle = fopen($csvFile, "r")) !== FALSE) {
             $row = 0;
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
@@ -108,9 +156,29 @@
         } else {
             echo "Error opening CSV file\n";
         }
-    
         $conn->close();
     }
+
+    function initizationDataBase($csvFile) {
+        $server = 'localhost';
+        $dbuser = 'root';
+        $dbpassword = '';
+       // $dbname = 'ElectricVehicleChargers';
+    
+        
+        // Create database connection
+        $conn = new mysqli($server, $dbuser, $dbpassword /*, $dbname*/);
+        if ($conn->connect_errno) {
+            die('Server connection failed: ' . $conn->connect_error);
+        }
+
+        $dbname = 'ElectricVehicleChargers';
+        createDatabase($conn, $dbname);
+        createTable($conn, $dbname);
+        insertRecordFromCsv($conn);
+
+    }
+   
 
     // Download the dataset
     $url = 'https://static.csdi.gov.hk/csdi-webpage/download/62b584a73c535b98bb484441ce1a0a48/csv';
