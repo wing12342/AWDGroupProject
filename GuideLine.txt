@@ -17,6 +17,8 @@ Add Address
 http://localhost/project/searchChargerEng.php?district={}&location={}&address={}
     ex=http://localhost/project/searchChargerEng.php?district=Eastern&location=Ming%20Wah%20Dai%20Ha&1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan$ADDRESS_EN=1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan
 
+Get all record
+http://localhost/project/getAllCharger.php
 //
 More than one parameters
 District
@@ -32,7 +34,6 @@ http://www.myserver.com/evcharger?district={} && location={} && address ={}
 
 POST
 URL:http://localhost/project/upDateChargerEng.php
-
 Json fromat ex:
 {
     "name_of_district_council_district_en": "Test1",
@@ -57,6 +58,13 @@ Json fromat ex:
     "data_path": "/path/to/data",
     "geometry_longitude": 123.456,
     "geometry_latitude": 78.910,
-    "shapeid": 1
+}
+
+DELETE
+http://localhost/delete_script.php
+Josn Format ex:
+{
+    "location_en": "Location A",
+    "address_en": "123 Main St",
 }
 
