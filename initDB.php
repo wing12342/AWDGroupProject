@@ -104,7 +104,7 @@
             echo "Error creating table: " . $conn->error . "<br>";
         }
     }
-    function insertRecordFromCsv($conn){
+    function insertRecordFromCsv($conn,$csvFile){
         if (($handle = fopen($csvFile, "r")) !== FALSE) {
             $row = 0;
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
@@ -175,7 +175,12 @@
         $dbname = 'ElectricVehicleChargers';
         createDatabase($conn, $dbname);
         createTable($conn, $dbname);
-        insertRecordFromCsv($conn);
+
+        $conn = new mysqli($server, $dbuser, $dbpassword , $dbname);
+        if ($conn->connect_errno) {
+            die('Server connection failed: ' . $conn->connect_error);
+        }
+        insertRecordFromCsv($conn,$csvFile);
 
     }
    
@@ -196,5 +201,3 @@
     $csvFile = '/Applications/XAMPP/xamppfiles/htdocs/project/EV_Charger_converted.csv';
     initizationDataBase($csvFile);
 ?>
-
-
