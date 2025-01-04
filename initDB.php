@@ -47,7 +47,7 @@
     function createDatabase($conn, $dbname) {
         $sql = "CREATE DATABASE IF NOT EXISTS $dbname";
         if ($conn->query($sql) === TRUE) {
-            echo "Database '$dbname' created successfully.<br>";
+            echo "<br>Database '$dbname' created successfully.<br>";
         } else {
             echo "Error creating database: " . $conn->error . "<br>";
         }
@@ -104,9 +104,13 @@
             echo "Error creating table: " . $conn->error . "<br>";
         }
     }
-    function insertRecordFromCsv($conn,$csvFile){
+    function insertRecordFromCsv($conn, $csvFile) {
         if (($handle = fopen($csvFile, "r")) !== FALSE) {
             $row = 0;
+            $successCount = 0;
+            $errorCount = 0;
+            $errorMessages = [];
+    
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                 if ($row == 0) {
                     $row++;
@@ -115,7 +119,9 @@
     
                 // Check if the data array has the correct number of elements
                 if (count($data) < 22) {
-                    echo "Row $row has insufficient data: " . implode(", ", $data) . "\n";
+                    $errorCount++;
+                    $errorMessages[] = "Row $row has insufficient data: " . implode(", ", $data);
+                    $row++;
                     continue; // Skip this row
                 }
     
@@ -143,20 +149,43 @@
     
                     // Execute the statement and check for errors
                     if (!$stmt->execute()) {
-                        echo "Execute failed on row $row: " . $stmt->error . "\n";
+                        $errorCount++;
+                        $errorMessages[] = "Execute failed on row $row: " . $stmt->error;
+                    } else {
+                        $successCount++;
                     }
+    
                     $stmt->close();
                 } else {
                     // Handle statement preparation failure
-                    echo "Prepare failed: " . $conn->error . "\n";
+                    $errorCount++;
+                    $errorMessages[] = "Prepare failed: " . $conn->error;
                 }
                 $row++;
             }
             fclose($handle);
+    
+            // Generate the import report
+            generateImportReport($successCount, $errorCount, $errorMessages);
         } else {
             echo "Error opening CSV file\n";
         }
         $conn->close();
+    }
+    
+    function generateImportReport($successCount, $errorCount, $errorMessages) {
+        echo "<h2>Import Report</h2>";
+        echo "<p>Records Successfully Imported: $successCount</p>";
+        echo "<p>Records Failed to Import: $errorCount</p>";
+    
+        if ($errorCount > 0) {
+            echo "<h3>Error Details:</h3>";
+            echo "<ul>";
+            foreach ($errorMessages as $error) {
+                echo "<li>$error</li>";
+            }
+            echo "</ul>";
+        }
     }
 
     function initizationDataBase($csvFile) {
