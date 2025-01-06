@@ -10,7 +10,7 @@ only District
 http://localhost/project/searchChargerEng.php?district[]={}
 http://localhost/project/searchChargerEng.php?location[]={}
 etc..
-More than one parameters
+More than one different parameters = And gate
 Add Location
 http://localhost/project/searchChargerEng.php?district[]={}&location={}
     ex=http://localhost/project/searchChargerEng.php?district[]=Eastern&location=Ming%20Wah%20Dai%20Ha&1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan
@@ -21,7 +21,7 @@ etc..
 Get all record
 http://localhost/project/getAllCharger.php
 
-More than one parameters
+More than one parameters = OR gate
 District
 Same parameters
 http://localhost/project/evcharger?district[]={}
