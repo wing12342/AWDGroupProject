@@ -54,6 +54,16 @@ if ($query) {
 $stmt->execute();
 $dbresult = $stmt->get_result();
 
+if ($dbresult->num_rows === 0) {
+    //http_response_code(404); // Not Found
+    $output = [
+        'result' => 'Error',
+        'message' => 'No records found.please check the input string.'
+    ];
+    echo json_encode($output);
+    exit; // Stop further execution
+}
+
 if ($dbresult) {
     $records = [];
     while ($row = $dbresult->fetch_assoc()) {

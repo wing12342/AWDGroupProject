@@ -74,4 +74,5 @@ Organize error codes into categories to facilitate understanding and troubleshoo
 For example:
 P000: An primay key column error occurred. Please check the input primary key record.
 P001:A record with this primary key already exists.
+R000:No records found.please check the input string.
 I000:An internal server error occurred. Please try again later.
