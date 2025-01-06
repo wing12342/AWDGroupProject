@@ -7,31 +7,31 @@
 GET METHOD
 Only one parameter
 only District
-http://localhost/project/searchChargerEng.php?district={}
-http://localhost/project/searchChargerEng.phplocation={}
+http://localhost/project/searchChargerEng.php?district[]={}
+http://localhost/project/searchChargerEng.php?location[]={}
 etc..
 More than one parameters
 Add Location
-http://localhost/project/searchChargerEng.php?district={}&location={}
-    ex=http://localhost/project/searchChargerEng.php?district=Eastern&location=Ming%20Wah%20Dai%20Ha&1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan
+http://localhost/project/searchChargerEng.php?district[]={}&location={}
+    ex=http://localhost/project/searchChargerEng.php?district[]=Eastern&location=Ming%20Wah%20Dai%20Ha&1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan
 Add Address
-http://localhost/project/searchChargerEng.php?district={}&location={}&address={}
-    ex=http://localhost/project/searchChargerEng.php?district=Eastern&location=Ming%20Wah%20Dai%20Ha&1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan$ADDRESS_EN=1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan
+http://localhost/project/searchChargerEng.php?district[]={}&location={}&address={}
+    ex=http://localhost/project/searchChargerEng.php?district[]=Eastern&location=Ming%20Wah%20Dai%20Ha&1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan$ADDRESS_EN=1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan
 etc..
 Get all record
 http://localhost/project/getAllCharger.php
-//
+
 More than one parameters
 District
 Same parameters
-http://localhost/project/evcharger?district={}
-http://localhost/project/evcharger?district={} || district={}
-http://localhost/project/evcharger?district={} || district={} && //etc....
+http://localhost/project/evcharger?district[]={}
+http://localhost/project/evcharger?district[]={} & district[]={}
+http://localhost/project/evcharger?district[]={} & district[]={} && //etc....
 
 Different parameters
-http://www.myserver.com/evcharger?district={} && location={}
-http://www.myserver.com/evcharger?district={} && location={} && address ={}
-//
+http://www.myserver.com/evcharger?district[]={} & location[]={}
+http://www.myserver.com/evcharger?district[]={} & location[]={} && address[] ={}
+
 
 POST
 URL:http://localhost/project/upDateChargerEng.php
