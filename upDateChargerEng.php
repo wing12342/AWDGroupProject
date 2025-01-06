@@ -6,10 +6,44 @@ header("Access-Control-Allow-Headers: *");
 $postData = file_get_contents("php://input");
 $requestData = json_decode($postData);
 
+/*
+if (empty($requestData->location_en_key OR $requestData->$address_en_key)) {
+    $output = array();
+	$output['result'] = 'error';
+    $output['ErrorCode'] = 'P000';
+	$output['message'] = 'An primay key column error occurred. Please check the input primary key column.';
+	echo json_encode($output);
+    exit;
+}
+*/
+
 include 'db.php';
 $conn->begin_transaction();
-
 try {
+    if(($location_en==$location_en_key) OR ($address_en==$address_en_key))
+    {
+         // Check if a record with the same primary key exists
+        $checkSql = 'SELECT COUNT(*) FROM ElectricVehicleChargers WHERE LOCATION_EN = ? AND ADDRESS_EN = ?'; 
+
+        $checkStmt = $conn->prepare($checkSql);
+        $checkStmt->bind_param('ss', 
+            $requestData->location_en,
+            $requestData->address_en
+        ); // Bind the primary key value from the request
+        $checkStmt->execute();
+        $checkStmt->bind_result($count);
+        $checkStmt->fetch();
+        $checkStmt->close();
+
+        if ($count > 0) {
+            $output = array();
+            $output['result'] = 'error';
+            $output['ErrorCode'] = '0001';
+            $output['message'] = 'A record with this primary key already exists.';
+            echo json_encode($output);
+            exit;
+        }
+    }
     
     // Update other details
     $sql = 'UPDATE ElectricVehicleChargers SET
@@ -63,8 +97,8 @@ try {
         $requestData->data_path,
         $requestData->geometry_longitude,
         $requestData->geometry_latitude,
-        $requestData->location_en,  // Last two parameters for WHERE clause
-        $requestData->address_en
+        $requestData->location_en_key,  // Last two parameters for WHERE clause
+        $requestData->address_en_key
         );
     $stmt->execute();
     
@@ -74,7 +108,7 @@ try {
 
 	$output = array();
 	$output['result'] = 'success';
-	$output['message'] = 'New status record created successfully';
+	$output['message'] = 'Record updated successfully';
 	echo json_encode($output);	
 
 }
@@ -82,7 +116,8 @@ catch (mysqli_sql_exception $exception) {
 	$conn->rollback();
 	$output = array();
 	$output['result'] = 'error';
-	$output['message'] = $exception->getMessage();
+    $output['ErrorCode'] = 'I000';
+	$output['message'] = 'An internal server error occurred. Please try again later.';
 	echo json_encode($output);
 	exit;
 }

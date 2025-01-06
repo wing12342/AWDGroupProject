@@ -12,6 +12,33 @@ include 'db.php';
 $conn->begin_transaction();
 
 try {
+
+    if(($location_en==$location_en_key) OR ($address_en==$address_en_key))
+    {
+         // Check if a record with the same primary key exists
+        $checkSql = 'SELECT COUNT(*) FROM ElectricVehicleChargers WHERE LOCATION_EN = ? AND ADDRESS_EN = ?'; 
+
+        $checkStmt = $conn->prepare($checkSql);
+        $checkStmt->bind_param('ss', 
+            $requestData->location_en,
+            $requestData->address_en
+        ); // Bind the primary key value from the request
+        $checkStmt->execute();
+        $checkStmt->bind_result($count);
+        $checkStmt->fetch();
+        $checkStmt->close();
+
+        if ($count > 0) {
+            $output = array();
+            $output['result'] = 'error';
+            $output['ErrorCode'] = '0001';
+            $output['message'] = 'A record with this primary key already exists.';
+            echo json_encode($output);
+            exit;
+        }
+    }
+
+
     $stmt = $conn->prepare("INSERT INTO ElectricVehicleChargers (
         NAME_OF_DISTRICT_COUNCIL_DISTRICT_EN, LOCATION_EN, ADDRESS_EN,
         NAME_OF_DISTRICT_COUNCIL_DISTRICT_TC, LOCATION_TC, ADDRESS_TC,

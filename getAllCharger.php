@@ -19,7 +19,8 @@ if ($dbresult) {
 } else {
 	$output = array();
 	$output['result'] = 'error';
-	$output['message'] = "Failed to retrieve module records - database error.";
+	$output['ErrorCode'] = 'D000';
+	$output['message'] = "Failed to retrieve module records - database error. Please check the dataBase Record Or SQL in related server";
 	echo json_encode($output);
 	exit;
 }

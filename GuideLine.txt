@@ -8,7 +8,8 @@ GET METHOD
 Only one parameter
 only District
 http://localhost/project/searchChargerEng.php?district={}
-    ex=http://localhost/project/searchChargerEng.php?district=Eastern
+http://localhost/project/searchChargerEng.phplocation={}
+etc..
 More than one parameters
 Add Location
 http://localhost/project/searchChargerEng.php?district={}&location={}
@@ -16,16 +17,16 @@ http://localhost/project/searchChargerEng.php?district={}&location={}
 Add Address
 http://localhost/project/searchChargerEng.php?district={}&location={}&address={}
     ex=http://localhost/project/searchChargerEng.php?district=Eastern&location=Ming%20Wah%20Dai%20Ha&1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan$ADDRESS_EN=1%20A%20Kung%20Ngam%20Rd,%20Shau%20Kei%20Wan
-
+etc..
 Get all record
 http://localhost/project/getAllCharger.php
 //
 More than one parameters
 District
 Same parameters
-http://www.myserver.com/evcharger?district={}
-http://www.myserver.com/evcharger?district={} || district={}
-http://www.myserver.com/evcharger?district={} || district={} && //etc....
+http://localhost/project/evcharger?district={}
+http://localhost/project/evcharger?district={} || district={}
+http://localhost/project/evcharger?district={} || district={} && //etc....
 
 Different parameters
 http://www.myserver.com/evcharger?district={} && location={}
@@ -34,7 +35,7 @@ http://www.myserver.com/evcharger?district={} && location={} && address ={}
 
 POST
 URL:http://localhost/project/upDateChargerEng.php
-Json fromat ex:
+Json fromat ex: (notice the primay key coloumn)
 {
     "name_of_district_council_district_en": "Test1",
     "location_en": "Ming Wah Dai Ha",
@@ -68,3 +69,9 @@ Josn Format ex:
     "address_en": "123 Main St",
 }
 
+Error Handing
+Organize error codes into categories to facilitate understanding and troubleshooting.
+For example:
+P000: An primay key column error occurred. Please check the input primary key record.
+P001:A record with this primary key already exists.
+I000:An internal server error occurred. Please try again later.
