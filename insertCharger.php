@@ -31,8 +31,8 @@ try {
         if ($count > 0) {
             $output = array();
             $output['result'] = 'error';
-            $output['ErrorCode'] = '0001';
-            $output['message'] = 'A record with this primary key already exists.';
+            $output['ErrorCode'] = 'D001';
+            $output['message'] = 'A record already exists. Please change the primary key';
             echo json_encode($output);
             exit;
         }
@@ -82,7 +82,11 @@ try {
         $conn->commit();
         $output = array('result' => 'success', 'message' => 'Record inserted successfully');
     } else {
-        $output = array('result' => 'error', 'message' => 'Insertion failed');
+        $output = array(
+        'result' => 'error', 
+        'ErrorCode' => 'D003',
+        'message' => 'Insertion failed, please try again'
+        );
     }
 
     echo json_encode($output);

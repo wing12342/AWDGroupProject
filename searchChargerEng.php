@@ -3,7 +3,9 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: *");
 header("Access-Control-Allow-Headers: *");
 header("Expires: 0"); // Proxies
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 include 'db.php';
 
@@ -58,7 +60,8 @@ if ($dbresult->num_rows === 0) {
     //http_response_code(404); // Not Found
     $output = [
         'result' => 'Error',
-        'message' => 'No records found.please check the input string.'
+        'ErrorCode' => 'D000',
+        'message' => 'No records found. please check the parameters.'
     ];
     echo json_encode($output);
     exit; // Stop further execution

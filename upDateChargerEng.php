@@ -38,8 +38,8 @@ try {
         if ($count > 0) {
             $output = array();
             $output['result'] = 'error';
-            $output['ErrorCode'] = '0001';
-            $output['message'] = 'A record with this primary key already exists.';
+            $output['ErrorCode'] = 'D001';
+            $output['message'] = 'Update failed ,a record already exists. Please change the primary key';
             echo json_encode($output);
             exit;
         }
