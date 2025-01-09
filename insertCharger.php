@@ -1,43 +1,41 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Methods: *");
 header("Access-Control-Allow-Headers: Content-Type");
+header('Content-Type: application/json');
 
-$postData = file_get_contents("php://input");
-$requestData = json_decode($postData);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 // Include your database connection
 include 'db.php';
 
+$postData = file_get_contents("php://input");
+$requestData = json_decode($postData);
+
 $conn->begin_transaction();
 
 try {
+    // Initialize necessary variables
+    $location_en_key = ''; // Define your keys
+    $address_en_key = '';  // Define your keys
 
-    if(($location_en==$location_en_key) OR ($address_en==$address_en_key))
-    {
-         // Check if a record with the same primary key exists
-        $checkSql = 'SELECT COUNT(*) FROM ElectricVehicleChargers WHERE LOCATION_EN = ? AND ADDRESS_EN = ?'; 
+    // Check if a record with the same primary key exists
+    $checkSql = 'SELECT COUNT(*) FROM ElectricVehicleChargers WHERE LOCATION_EN = ? AND ADDRESS_EN = ?';
+    $checkStmt = $conn->prepare($checkSql);
+    $checkStmt->bind_param('ss', 
+        $requestData->location_en,
+        $requestData->address_en
+    );
+    $checkStmt->execute();
+    $checkStmt->bind_result($count);
+    $checkStmt->fetch();
+    $checkStmt->close();
 
-        $checkStmt = $conn->prepare($checkSql);
-        $checkStmt->bind_param('ss', 
-            $requestData->location_en,
-            $requestData->address_en
-        ); // Bind the primary key value from the request
-        $checkStmt->execute();
-        $checkStmt->bind_result($count);
-        $checkStmt->fetch();
-        $checkStmt->close();
-
-        if ($count > 0) {
-            $output = array();
-            $output['result'] = 'error';
-            $output['ErrorCode'] = 'D001';
-            $output['message'] = 'A record already exists. Please change the primary key';
-            echo json_encode($output);
-            exit;
-        }
+    if ($count > 0) {
+        echo json_encode(['result' => 'error', 'ErrorCode' => 'D001', 'message' => 'A record already exists. Please change the primary key']);
+        exit;
     }
-
 
     $stmt = $conn->prepare("INSERT INTO ElectricVehicleChargers (
         NAME_OF_DISTRICT_COUNCIL_DISTRICT_EN, LOCATION_EN, ADDRESS_EN,
@@ -73,27 +71,22 @@ try {
             $requestData->remark_for_others_,
             $requestData->data_path,
             $requestData->geometry_longitude,
-            $requestData->geometry_latitude,
+            $requestData->geometry_latitude
         );
-    }
-    $stmt->execute();
+        
+        $stmt->execute();
 
-    if ($stmt->affected_rows > 0) {
-        $conn->commit();
-        $output = array('result' => 'success', 'message' => 'Record inserted successfully');
-    } else {
-        $output = array(
-        'result' => 'error', 
-        'ErrorCode' => 'D003',
-        'message' => 'Insertion failed, please try again'
-        );
+        if ($stmt->affected_rows > 0) {
+            $conn->commit();
+            echo json_encode(['result' => 'success', 'message' => 'Record inserted successfully']);
+        } else {
+            echo json_encode(['result' => 'error', 'ErrorCode' => 'D003', 'message' => 'Insertion failed, please try again']);
+        }
     }
 
-    echo json_encode($output);
 } catch (mysqli_sql_exception $exception) {
     $conn->rollback();
-    $output = array('result' => 'error', 'message' => $exception->getMessage());
-    echo json_encode($output);
+    echo json_encode(['result' => 'error', 'message' => $exception->getMessage()]);
     exit;
 }
 
