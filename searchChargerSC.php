@@ -13,7 +13,6 @@ include 'db.php';
 $district = isset($_GET['district']) ? (array) $_GET['district'] : [];
 $location = isset($_GET['location']) ? (array) $_GET['location'] : [];
 $addresse = isset($_GET['address']) ? (array) $_GET['address'] : [];
-$language = $_GET['address'];
 // Construct SQL
 $queryParts = [];
 $params = [];
@@ -21,20 +20,20 @@ $params = [];
 // Build query parts based on provided parameters
 if (!empty($district)) {
     $districtPlaceholders = implode(',', array_fill(0, count($district), '?'));
-    $queryParts[] = "NAME_OF_DISTRICT_COUNCIL_DISTRICT_EN IN ($districtPlaceholders)";
+    $queryParts[] = "NAME_OF_DISTRICT_COUNCIL_DISTRICT_SC IN ($districtPlaceholders)";
     $params = array_merge($params, $district);
 }
 
 
 if (!empty($location)) {
     $locationPlaceholders = implode(',', array_fill(0, count($location), '?'));
-    $queryParts[] = "LOCATION_EN IN ($locationPlaceholders)";
+    $queryParts[] = "LOCATION_SC IN ($locationPlaceholders)";
     $params = array_merge($params, $location);
 }
 
 if (!empty($addresse)) {
     $addressPlaceholders = implode(',', array_fill(0, count($addresse), '?'));
-    $queryParts[] = "ADDRESS_EN IN ($addressPlaceholders)";
+    $queryParts[] = "ADDRESS_SC IN ($addressPlaceholders)";
     $params = array_merge($params, $addresse);
 }
 
@@ -89,5 +88,3 @@ if ($dbresult) {
 $stmt->close();
 $conn->close();
 ?>
-
-
