@@ -16,10 +16,13 @@ if (empty($requestData->location_en_key OR $requestData->$address_en_key)) {
     exit;
 }
 */
-
+echo '<pre>';
+print_r($requestData);
+echo '</pre>';
 include 'db.php';
 $conn->begin_transaction();
 try {
+    /*
     if(($location_en==$location_en_key) OR ($address_en==$address_en_key))
     {
          // Check if a record with the same primary key exists
@@ -44,6 +47,7 @@ try {
             exit;
         }
     }
+        */
     
     // Update other details
     $sql = 'UPDATE ElectricVehicleChargers SET
@@ -103,7 +107,12 @@ try {
     $stmt->execute();
     
     // Commit the transaction
-    $conn->commit();
+    if ($stmt->affected_rows > 0) {
+        $conn->commit();
+        echo json_encode(['result' => 'success', 'message' => 'Record inserted successfully']);
+    } else {
+        echo json_encode(['result' => 'error', 'ErrorCode' => 'D003', 'message' => 'Insertion failed, please try again']);
+    }
 
 
 	$output = array();
