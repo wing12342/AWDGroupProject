@@ -22,8 +22,8 @@ echo '</pre>';
 include 'db.php';
 $conn->begin_transaction();
 try {
-    /*
-    if(($location_en==$location_en_key) OR ($address_en==$address_en_key))
+    
+    if(!($location_en==$location_en_key) OR ($address_en==$address_en_key))
     {
          // Check if a record with the same primary key exists
         $checkSql = 'SELECT COUNT(*) FROM ElectricVehicleChargers WHERE LOCATION_EN = ? AND ADDRESS_EN = ?'; 
@@ -47,7 +47,7 @@ try {
             exit;
         }
     }
-        */
+        
     
     // Update other details
     $sql = 'UPDATE ElectricVehicleChargers SET
