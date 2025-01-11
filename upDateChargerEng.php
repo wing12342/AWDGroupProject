@@ -23,7 +23,7 @@ include 'db.php';
 $conn->begin_transaction();
 try {
     
-    if(!($location_en==$location_en_key) OR ($address_en==$address_en_key))
+    if(!(($requestData->location_en== $requestData->$location_en_key) OR ( $requestData->$address_en== $requestData->$address_en_key)))
     {
          // Check if a record with the same primary key exists
         $checkSql = 'SELECT COUNT(*) FROM ElectricVehicleChargers WHERE LOCATION_EN = ? AND ADDRESS_EN = ?'; 
@@ -47,6 +47,7 @@ try {
             exit;
         }
     }
+        
         
     
     // Update other details
@@ -109,17 +110,13 @@ try {
     // Commit the transaction
     if ($stmt->affected_rows > 0) {
         $conn->commit();
-        echo json_encode(['result' => 'success', 'message' => 'Record inserted successfully']);
+	    $output = array();
+	    $output['result'] = 'success';
+	    $output['message'] = 'Record updated successfully';
+	    echo json_encode($output);	
     } else {
-        echo json_encode(['result' => 'error', 'ErrorCode' => 'D003', 'message' => 'Insertion failed, please try again']);
+        echo json_encode(['result' => 'error', 'ErrorCode' => 'D003', 'message' => 'Updated, please try again']);
     }
-
-
-	$output = array();
-	$output['result'] = 'success';
-	$output['message'] = 'Record updated successfully';
-	echo json_encode($output);	
-
 }
 catch (mysqli_sql_exception $exception) {
 	$conn->rollback();

@@ -1,0 +1,1 @@
+Unknown column 'QUICK_GB_T20234_3_DC_no' in 'field list'Unknown column 'QUICK_GB_T20234_3_DC_no' in 'field list'
