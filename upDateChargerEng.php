@@ -2,10 +2,11 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: *");
 header("Access-Control-Allow-Headers: *");
-
+header('Content-Type: application/json');
 $postData = file_get_contents("php://input");
 $requestData = json_decode($postData);
-
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 /*
 if (empty($requestData->location_en_key OR $requestData->$address_en_key)) {
     $output = array();
@@ -16,13 +17,12 @@ if (empty($requestData->location_en_key OR $requestData->$address_en_key)) {
     exit;
 }
 */
-echo '<pre>';
 print_r($requestData);
-echo '</pre>';
 include 'db.php';
 $conn->begin_transaction();
 try {
     
+    /*
     if(!(($requestData->location_en== $requestData->$location_en_key) OR ( $requestData->$address_en== $requestData->$address_en_key)))
     {
          // Check if a record with the same primary key exists
@@ -48,6 +48,7 @@ try {
         }
     }
         
+    */
         
     
     // Update other details
@@ -115,11 +116,13 @@ try {
 	    $output['message'] = 'Record updated successfully';
 	    echo json_encode($output);	
     } else {
-        echo json_encode(['result' => 'error', 'ErrorCode' => 'D003', 'message' => 'Updated, please try again']);
+        echo json_encode(['result' => 'error', 'ErrorCode' => 'D003', 'message' => 'Updated failed, please try again']);
     }
 }
 catch (mysqli_sql_exception $exception) {
 	$conn->rollback();
+    error_log('Database error: ' . $exception->getMessage());
+
 	$output = array();
 	$output['result'] = 'error';
     $output['ErrorCode'] = 'I000';
