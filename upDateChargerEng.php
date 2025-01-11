@@ -17,40 +17,51 @@ if (empty($requestData->location_en_key OR $requestData->$address_en_key)) {
     exit;
 }
 */
-print_r($requestData);
+//print_r($requestData);
 include 'db.php';
 $conn->begin_transaction();
 try {
-    
     /*
-    if(!(($requestData->location_en== $requestData->$location_en_key) OR ( $requestData->$address_en== $requestData->$address_en_key)))
-    {
-         // Check if a record with the same primary key exists
-        $checkSql = 'SELECT COUNT(*) FROM ElectricVehicleChargers WHERE LOCATION_EN = ? AND ADDRESS_EN = ?'; 
+    // Ensure key variables are defined
+    $location_en_key = isset($requestData->location_en_key) ? $requestData->location_en_key : null;
+    $address_en_key = isset($requestData->address_en_key) ? $requestData->address_en_key : null;
 
+    // Check if location and address exist in requestData
+    if (!(isset($requestData->location_en) && $requestData->location_en == $location_en_key) || !(isset($requestData->address_en) && $requestData->address_en == $address_en_key)) {
+    
+        // Check if a record with the same primary key exists
+        $checkSql = 'SELECT COUNT(*) FROM ElectricVehicleChargers WHERE LOCATION_EN = ? AND ADDRESS_EN = ?'; 
         $checkStmt = $conn->prepare($checkSql);
+        
+        if ($checkStmt === false) {
+            echo json_encode(['result' => 'error', 'ErrorCode' => 'D002', 'message' => 'Database error.']);
+            exit;
+        }
+        // Check if both properties are set before binding
+        $location_en = isset($requestData->location_en) ? $requestData->location_en : null;
+        $address_en = isset($requestData->address_en) ? $requestData->address_en : null;
+
         $checkStmt->bind_param('ss', 
-            $requestData->location_en,
-            $requestData->address_en
-        ); // Bind the primary key value from the request
+            $location_en,
+            $address_en
+        );
+
         $checkStmt->execute();
         $checkStmt->bind_result($count);
         $checkStmt->fetch();
         $checkStmt->close();
 
         if ($count > 0) {
-            $output = array();
-            $output['result'] = 'error';
-            $output['ErrorCode'] = 'D001';
-            $output['message'] = 'Update failed ,a record already exists. Please change the primary key';
-            echo json_encode($output);
-            exit;
+                $output = [
+                    'result' => 'error',
+                    'ErrorCode' => 'D001',
+                    'message' => 'Update failed, a record already exists. Please change the primary key.'
+                ];
+                echo json_encode($output);
+                exit;
         }
     }
-        
     */
-        
-    
     // Update other details
     $sql = 'UPDATE ElectricVehicleChargers SET
     NAME_OF_DISTRICT_COUNCIL_DISTRICT_EN = ?, 
