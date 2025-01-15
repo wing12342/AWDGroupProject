@@ -62,44 +62,35 @@
     
         // SQL to create a new table
         $createTableSQL = "CREATE TABLE `ElectricVehicleChargers` (
-            `NAME_OF_DISTRICT_COUNCIL_DISTRICT_EN` varchar(50) NOT NULL,
-            `LOCATION_EN` varchar(200) NOT NULL,
-            `ADDRESS_EN` varchar(200) NOT NULL,
-            `NAME_OF_DISTRICT_COUNCIL_DISTRICT_TC` varchar(20) NOT NULL,
-            `LOCATION_TC` varchar(50) NOT NULL,
-            `ADDRESS_TC` varchar(50) NOT NULL,
-            `NAME_OF_DISTRICT_COUNCIL_DISTRICT_SC` varchar(20) NOT NULL,
-            `LOCATION_SC` varchar(50) NOT NULL,
-            `ADDRESS_SC` varchar(50) NOT NULL,
-            `STANDARD_BS1363_no` varchar(50) NOT NULL,
-            `MEDIUM_IEC62196_no` varchar(5) NOT NULL,
-            `MEDIUM_SAEJ1772_no` varchar(5) NOT NULL,
-            `MEDIUM_OTHERS_no` varchar(5) NOT NULL,
-            `QUICK_CHAdeMO_no` varchar(5) NOT NULL,
-            `QUICK_CCS_DC_COMBO_no` varchar(5) NOT NULL,
-            `QUICK_IEC62196_no` varchar(5) NOT NULL,
-            `QUICK_GB_T20234_3_DC__no` varchar(5) NOT NULL,
-            `QUICK_OTHERS_no` varchar(5) NOT NULL,
-            `REMARK_FOR__OTHERS_` varchar(50) DEFAULT NULL,
-            `DATA_PATH` varchar(200) DEFAULT NULL,
-            `GeometryLongitude` double(40,30) NOT NULL,
-            `GeometryLatitude` double(40,30) NOT NULL
+            `ID` INT NOT NULL AUTO_INCREMENT,
+            `NAME_OF_DISTRICT_COUNCIL_DISTRICT_EN` VARCHAR(50) NOT NULL,
+            `LOCATION_EN` VARCHAR(200) NOT NULL,
+            `ADDRESS_EN` VARCHAR(200) NOT NULL,
+            `NAME_OF_DISTRICT_COUNCIL_DISTRICT_TC` VARCHAR(20) NOT NULL,
+            `LOCATION_TC` VARCHAR(50) NOT NULL,
+            `ADDRESS_TC` VARCHAR(50) NOT NULL,
+            `NAME_OF_DISTRICT_COUNCIL_DISTRICT_SC` VARCHAR(20) NOT NULL,
+            `LOCATION_SC` VARCHAR(50) NOT NULL,
+            `ADDRESS_SC` VARCHAR(50) NOT NULL,
+            `STANDARD_BS1363_no` VARCHAR(50) NOT NULL,
+            `MEDIUM_IEC62196_no` VARCHAR(5) NOT NULL,
+            `MEDIUM_SAEJ1772_no` VARCHAR(5) NOT NULL,
+            `MEDIUM_OTHERS_no` VARCHAR(5) NOT NULL,
+            `QUICK_CHAdeMO_no` VARCHAR(5) NOT NULL,
+            `QUICK_CCS_DC_COMBO_no` VARCHAR(5) NOT NULL,
+            `QUICK_IEC62196_no` VARCHAR(5) NOT NULL,
+            `QUICK_GB_T20234_3_DC_no` VARCHAR(5) NOT NULL,
+            `QUICK_OTHERS_no` VARCHAR(5) NOT NULL,
+            `REMARK_FOR_OTHERS` VARCHAR(50) DEFAULT NULL,
+            `DATA_PATH` VARCHAR(200) DEFAULT NULL,
+            `GeometryLongitude` DOUBLE NOT NULL,
+            `GeometryLatitude` DOUBLE NOT NULL,
+            PRIMARY KEY (`ID`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
     
         // Execute the CREATE TABLE query
         if ($conn->query($createTableSQL) === TRUE) {
             echo "Table 'ElectricVehicleChargers' created successfully.<br>";
-            
-            // SQL to add the primary key
-            $addPrimaryKeySQL = "ALTER TABLE `ElectricVehicleChargers`
-                ADD PRIMARY KEY (`ADDRESS_EN`, `LOCATION_EN`);";
-            
-            // Execute the ALTER TABLE query
-            if ($conn->query($addPrimaryKeySQL) === TRUE) {
-                echo "Primary key added successfully.<br>";
-            } else {
-                echo "Error adding primary key: " . $conn->error . "<br>";
-            }
         } else {
             echo "Error creating table: " . $conn->error . "<br>";
         }
@@ -131,20 +122,22 @@
                     NAME_OF_DISTRICT_COUNCIL_DISTRICT_TC, LOCATION_TC, ADDRESS_TC,
                     NAME_OF_DISTRICT_COUNCIL_DISTRICT_SC, LOCATION_SC, ADDRESS_SC,
                     STANDARD_BS1363_no, MEDIUM_IEC62196_no, MEDIUM_SAEJ1772_no, MEDIUM_OTHERS_no,
-                    QUICK_CHAdeMO_no, QUICK_CCS_DC_COMBO_no, QUICK_IEC62196_no, QUICK_GB_T20234_3_DC__no, QUICK_OTHERS_no,
-                    REMARK_FOR__OTHERS_, DATA_PATH, GeometryLongitude, GeometryLatitude
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?)");
+                    QUICK_CHAdeMO_no, QUICK_CCS_DC_COMBO_no, QUICK_IEC62196_no, QUICK_GB_T20234_3_DC_no, QUICK_OTHERS_no,
+                    REMARK_FOR_OTHERS, DATA_PATH, GeometryLongitude, GeometryLatitude
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     
                 if ($stmt) {
-                    // Bind the parameters
+                    // Bind the parameters (note the removal of the ID parameter)
                     $stmt->bind_param(
                         "ssssssssssssssssssssdd",
-                        $data[0], $data[1], $data[2],
-                        $data[3], $data[4], $data[5],
-                        $data[6], $data[7], $data[8],
-                        $data[9], $data[10], $data[11], $data[12],
-                        $data[13], $data[14], $data[15], $data[16], $data[17],
-                        $data[18], $data[19], $data[20], $data[21]
+                        $data[0],
+                        $data[1], $data[2], $data[3],  // Adjust indices based on your CSV structure
+                        $data[4], $data[5], $data[6],
+                        $data[7], $data[8], $data[9],
+                        $data[10], $data[11], $data[12],
+                        $data[13], $data[14], $data[15],
+                        $data[16], $data[17], $data[18],
+                        $data[19], $data[20], $data[21]
                     );
     
                     // Execute the statement and check for errors
@@ -161,7 +154,8 @@
                     $errorCount++;
                     $errorMessages[] = "Prepare failed: " . $conn->error;
                 }
-                $row++;
+    
+                $row++; // Increment the row counter here
             }
             fclose($handle);
     
@@ -170,8 +164,10 @@
         } else {
             echo "Error opening CSV file\n";
         }
-        $conn->close();
     }
+    
+        // Do not close the connection here if you plan to use it later
+        // $conn->close();
     
     function generateImportReport($successCount, $errorCount, $errorMessages) {
         echo "<h2>Import Report</h2>";

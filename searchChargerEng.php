@@ -13,28 +13,27 @@ include 'db.php';
 $district = isset($_GET['district']) ? (array) $_GET['district'] : [];
 $location = isset($_GET['location']) ? (array) $_GET['location'] : [];
 $addresse = isset($_GET['address']) ? (array) $_GET['address'] : [];
-$language = $_GET['address'];
 // Construct SQL
 $queryParts = [];
 $params = [];
 
 // Build query parts based on provided parameters
+// Build query parts based on provided parameters
 if (!empty($district)) {
     $districtPlaceholders = implode(',', array_fill(0, count($district), '?'));
-    $queryParts[] = "NAME_OF_DISTRICT_COUNCIL_DISTRICT_EN IN ($districtPlaceholders)";
+    $queryParts[] = "NAME_OF_DISTRICT_COUNCIL_DISTRICT_EN LIKE CONCAT('%', ?, '%')";
     $params = array_merge($params, $district);
 }
 
-
 if (!empty($location)) {
     $locationPlaceholders = implode(',', array_fill(0, count($location), '?'));
-    $queryParts[] = "LOCATION_EN IN ($locationPlaceholders)";
+    $queryParts[] = "LOCATION_EN LIKE CONCAT('%', ?, '%')";
     $params = array_merge($params, $location);
 }
 
 if (!empty($addresse)) {
     $addressPlaceholders = implode(',', array_fill(0, count($addresse), '?'));
-    $queryParts[] = "ADDRESS_EN IN ($addressPlaceholders)";
+    $queryParts[] = "ADDRESS_EN LIKE CONCAT('%', ?, '%')";
     $params = array_merge($params, $addresse);
 }
 
@@ -44,44 +43,50 @@ if (!empty($queryParts)) {
     $query = ' WHERE ' . implode(' AND ', $queryParts);
 }
 
-// Prepare and execute the SQL statement
 $sql = "SELECT * FROM ElectricVehicleChargers" . $query;
-//echo $sql;
 $stmt = $conn->prepare($sql);
 
-if ($query) {
+if ($stmt) {
     // Bind the parameters 
-    $stmt->bind_param(str_repeat('s', count($params)), ...$params);
-}
-
-$stmt->execute();
-$dbresult = $stmt->get_result();
-
-if ($dbresult->num_rows === 0) {
-    //http_response_code(404); // Not Found
-    $output = [
-        'result' => 'Error',
-        'ErrorCode' => 'D000',
-        'message' => 'No records found. please check the parameters.'
-    ];
-    echo json_encode($output);
-    exit; // Stop further execution
-}
-
-if ($dbresult) {
-    $records = [];
-    while ($row = $dbresult->fetch_assoc()) {
-        $records[] = $row;
+    if (!empty($params)) {
+        $stmt->bind_param(str_repeat('s', count($params)), ...$params);
     }
-    $output = [
-        'result' => 'success',
-        'message' => $records
-    ];
-    echo json_encode($output);
+
+    $stmt->execute();
+    $dbresult = $stmt->get_result();
+
+    if ($dbresult->num_rows === 0) {
+        http_response_code(404); // Not Found
+        $output = [
+            'result' => 'Error',
+            'ErrorCode' => 'D000',
+            'message' => 'No records found. please check the parameters.'
+        ];
+        echo json_encode($output);
+        exit; // Stop further execution
+    }
+
+    if ($dbresult) {
+        $records = [];
+        while ($row = $dbresult->fetch_assoc()) {
+            $records[] = $row;
+        }
+        $output = [
+            'result' => 'success',
+            'message' => $records
+        ];
+        echo json_encode($output);
+    } else {
+        $output = [
+            'result' => 'error',
+            'message' => "Failed to retrieve module records - database error."
+        ];
+        echo json_encode($output);
+    }
 } else {
     $output = [
         'result' => 'error',
-        'message' => "Failed to retrieve module records - database error."
+        'message' => "Failed to prepare SQL statement."
     ];
     echo json_encode($output);
 }

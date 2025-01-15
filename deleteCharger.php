@@ -12,12 +12,11 @@ include 'db.php';
 $conn->begin_transaction();
 
 try {
-    $sql = 'DELETE FROM ElectricVehicleChargers WHERE LOCATION_EN = ? AND ADDRESS_EN = ?';
+    $sql = 'DELETE FROM ElectricVehicleChargers WHERE ID = ? ';
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
-        'ss', 
-        $requestData->location_en,
-        $requestData->address_en
+        'i', 
+        $requestData->id,
     ); // Assuming shapeid is an integer
     $stmt->execute();
 

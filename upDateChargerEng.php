@@ -3,95 +3,61 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: *");
 header("Access-Control-Allow-Headers: *");
 header('Content-Type: application/json');
-$postData = file_get_contents("php://input");
-$requestData = json_decode($postData);
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-/*
-if (empty($requestData->location_en_key OR $requestData->$address_en_key)) {
-    $output = array();
-	$output['result'] = 'error';
-    $output['ErrorCode'] = 'P000';
-	$output['message'] = 'An primay key column error occurred. Please check the input primary key column.';
-	echo json_encode($output);
+
+// Get the raw PUT data
+$putData = file_get_contents("php://input");
+$requestData = json_decode($putData);
+
+// Check for JSON decoding errors
+if (json_last_error() !== JSON_ERROR_NONE) {
+    echo json_encode([
+        'result' => 'error',
+        'ErrorCode' => 'P001',
+        'message' => 'Invalid JSON format.'
+    ]);
     exit;
 }
-*/
-//print_r($requestData);
+
+// Include database connection
 include 'db.php';
 $conn->begin_transaction();
 try {
-    /*
-    // Ensure key variables are defined
-    $location_en_key = isset($requestData->location_en_key) ? $requestData->location_en_key : null;
-    $address_en_key = isset($requestData->address_en_key) ? $requestData->address_en_key : null;
-
-    // Check if location and address exist in requestData
-    if (!(isset($requestData->location_en) && $requestData->location_en == $location_en_key) || !(isset($requestData->address_en) && $requestData->address_en == $address_en_key)) {
-    
-        // Check if a record with the same primary key exists
-        $checkSql = 'SELECT COUNT(*) FROM ElectricVehicleChargers WHERE LOCATION_EN = ? AND ADDRESS_EN = ?'; 
-        $checkStmt = $conn->prepare($checkSql);
-        
-        if ($checkStmt === false) {
-            echo json_encode(['result' => 'error', 'ErrorCode' => 'D002', 'message' => 'Database error.']);
-            exit;
-        }
-        // Check if both properties are set before binding
-        $location_en = isset($requestData->location_en) ? $requestData->location_en : null;
-        $address_en = isset($requestData->address_en) ? $requestData->address_en : null;
-
-        $checkStmt->bind_param('ss', 
-            $location_en,
-            $address_en
-        );
-
-        $checkStmt->execute();
-        $checkStmt->bind_result($count);
-        $checkStmt->fetch();
-        $checkStmt->close();
-
-        if ($count > 0) {
-                $output = [
-                    'result' => 'error',
-                    'ErrorCode' => 'D001',
-                    'message' => 'Update failed, a record already exists. Please change the primary key.'
-                ];
-                echo json_encode($output);
-                exit;
-        }
-    }
-    */
-    // Update other details
+ 
     $sql = 'UPDATE ElectricVehicleChargers SET
-    NAME_OF_DISTRICT_COUNCIL_DISTRICT_EN = ?, 
-    LOCATION_EN = ?, 
-    ADDRESS_EN = ?, 
-    NAME_OF_DISTRICT_COUNCIL_DISTRICT_TC = ?, 
-    LOCATION_TC = ?, 
-    ADDRESS_TC = ?, 
-    NAME_OF_DISTRICT_COUNCIL_DISTRICT_SC = ?, 
-    LOCATION_SC = ?, 
-    ADDRESS_SC = ?, 
-    STANDARD_BS1363_no = ?, 
-    MEDIUM_IEC62196_no = ?, 
-    MEDIUM_SAEJ1772_no = ?, 
-    MEDIUM_OTHERS_no = ?, 
-    QUICK_CHAdeMO_no = ?, 
-    QUICK_CCS_DC_COMBO_no = ?, 
-    QUICK_IEC62196_no = ?, 
-    QUICK_GB_T20234_3_DC__no = ?, 
-    QUICK_OTHERS_no = ?, 
-    REMARK_FOR__OTHERS_ = ?, 
-    DATA_PATH = ?, 
-    GeometryLongitude = ?, 
-    GeometryLatitude = ? 
-    WHERE LOCATION_EN = ? AND ADDRESS_EN = ?';
-
-
+        NAME_OF_DISTRICT_COUNCIL_DISTRICT_EN = ?, 
+        LOCATION_EN = ?, 
+        ADDRESS_EN = ?, 
+        NAME_OF_DISTRICT_COUNCIL_DISTRICT_TC = ?, 
+        LOCATION_TC = ?, 
+        ADDRESS_TC = ?, 
+        NAME_OF_DISTRICT_COUNCIL_DISTRICT_SC = ?, 
+        LOCATION_SC = ?, 
+        ADDRESS_SC = ?, 
+        STANDARD_BS1363_no = ?, 
+        MEDIUM_IEC62196_no = ?, 
+        MEDIUM_SAEJ1772_no = ?, 
+        MEDIUM_OTHERS_no = ?, 
+        QUICK_CHAdeMO_no = ?, 
+        QUICK_CCS_DC_COMBO_no = ?, 
+        QUICK_IEC62196_no = ?, 
+        QUICK_GB_T20234_3_DC_no = ?, 
+        QUICK_OTHERS_no = ?, 
+        REMARK_FOR_OTHERS = ?, 
+        DATA_PATH = ?, 
+        GeometryLongitude = ?, 
+        GeometryLatitude = ? 
+        WHERE ID= ?';
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('ssssssssssssssssssssddss', 
+    if ($stmt === false) {
+        throw new mysqli_sql_exception('Statement preparation failed: ' . $conn->error);
+    }
+
+    // Bind parameters
+    $stmt->bind_param('ssssssssssssssssssssddi', 
         $requestData->name_of_district_council_district_en,
         $requestData->location_en,
         $requestData->address_en,
@@ -114,33 +80,38 @@ try {
         $requestData->data_path,
         $requestData->geometry_longitude,
         $requestData->geometry_latitude,
-        $requestData->location_en_key,  // Last two parameters for WHERE clause
-        $requestData->address_en_key
-        );
-    $stmt->execute();
-    
+        $requestData->id 
+    );
+
+    // Execute statement
+    if (!$stmt->execute()) {
+        throw new mysqli_sql_exception('Execute failed: ' . $stmt->error);
+    }
+
     // Commit the transaction
     if ($stmt->affected_rows > 0) {
         $conn->commit();
-	    $output = array();
-	    $output['result'] = 'success';
-	    $output['message'] = 'Record updated successfully';
-	    echo json_encode($output);	
+        echo json_encode([
+            'result' => 'success',
+            'message' => 'Record updated successfully'
+        ]);
     } else {
-        echo json_encode(['result' => 'error', 'ErrorCode' => 'D003', 'message' => 'Updated failed, please try again']);
+        echo json_encode([
+            'result' => 'error',
+            'ErrorCode' => 'D003',
+            'message' => 'Update failed, no changes made.'
+        ]);
     }
-}
-catch (mysqli_sql_exception $exception) {
-	$conn->rollback();
+} catch (mysqli_sql_exception $exception) {
+    $conn->rollback();
     error_log('Database error: ' . $exception->getMessage());
 
-	$output = array();
-	$output['result'] = 'error';
-    $output['ErrorCode'] = 'I000';
-	$output['message'] = 'An internal server error occurred. Please try again later.';
-	echo json_encode($output);
-	exit;
+    echo json_encode([
+        'result' => 'error',
+        'ErrorCode' => 'I000',
+        'message' => 'A MySQL error occurred. Please try again later.'
+    ]);
+} finally {
+    $conn->close();
 }
-
-$conn->close();
 ?>

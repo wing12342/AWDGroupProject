@@ -4,6 +4,31 @@
 ||=OR Gate
 &&= AND Gate
 
+
+Get all record
+http://localhost/project/getAllCharger.php
+
+Search
+OR Gate
+http://localhost/project/searchChargerEng.php?district[]=Eastern & district[]=ShaTin
+Error
+http://localhost/project/searchChargerEng.php?district[]=
+{"result":"Error","ErrorCode":"D000","message":"No records found. please check the parameters."}
+AND Gate
+http://localhost/project/searchChargerEng.php?http://localhost/project/evcharger?district[]=Eastern & location[]=Ming Wah Dai Ha
+
+POST
+
+PUT
+http://localhost/project/insertCharger.php
+
+DELETE
+http://localhost/project/deleteCharger.php
+
+
+
+
+
 GET METHOD
 Only one parameter
 only District
